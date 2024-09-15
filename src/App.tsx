@@ -1,4 +1,15 @@
-import { createRoot } from "react-dom/client";
+import * as React from "react";
+import Task from "./components/Task";
+import TaskList from "./components/TaskList";
 
-const root = createRoot(document.body);
-root.render(<h2>Hello, world!</h2>);
+const App = () => {
+  return (
+    <div className="App">
+      <h1>My tasks</h1>
+      <Task />
+      <TaskList />
+    </div>
+  );
+};
+
+export default App;
