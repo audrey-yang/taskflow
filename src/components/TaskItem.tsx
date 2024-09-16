@@ -24,11 +24,9 @@ const addTask = async (description: string, pri: Priority) => {
         priority: pri,
         status: 0,
       });
-      return id;
     }
   } catch (error) {
     console.log(error);
-    return -1;
   }
 };
 
@@ -59,15 +57,20 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
   const [status, setStatus] = useState(task?.status ?? 0);
 
   return (
-    <Accordion expanded={expanded}>
+    <Accordion expanded={expanded} disabled={task === null}>
       <AccordionSummary
-        expandIcon={<ExpandMoreIcon onClick={() => setExpanded(!expanded)} />}
+        expandIcon={
+          task ? (
+            <ExpandMoreIcon onClick={() => setExpanded(!expanded)} />
+          ) : null
+        }
       >
         {isEditing ? (
           <>
             <TextField
               label="Description"
               onChange={(ev) => setDescription(ev.target.value)}
+              value={description}
               className="w-1/2 mx-2"
             />
             <Select
@@ -81,33 +84,35 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
               <MenuItem value={2}>High</MenuItem>
             </Select>
             <IconButton
-              aria-label="add"
               onClick={() => {
                 if (!task) {
                   addTask(description, priority as Priority);
+                  setDescription("");
+                  setPriority(0);
                 } else {
                   updateTask(task.id, {
                     description,
                     priority: priority as Priority,
                   });
+                  setIsEditing(false);
                 }
-                setIsEditing(false);
               }}
               className="w-1/8"
             >
               <DoneIcon />
             </IconButton>
-            <IconButton
-              aria-label="add"
-              onClick={() => {
-                setDescription(task?.description);
-                setPriority(task?.priority);
-                setIsEditing(false);
-              }}
-              className="w-1/8"
-            >
-              <CloseIcon />
-            </IconButton>
+            {task ? (
+              <IconButton
+                onClick={() => {
+                  setDescription(task?.description);
+                  setPriority(task?.priority);
+                  setIsEditing(false);
+                }}
+                className="w-1/8"
+              >
+                <CloseIcon />
+              </IconButton>
+            ) : null}
           </>
         ) : (
           <>
