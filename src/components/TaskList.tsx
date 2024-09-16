@@ -14,6 +14,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import * as api from "./../db/api";
+import NewTask from "./NewTask";
 
 const TaskList = () => {
   const [isAdding, setIsAdding] = useState(false);
@@ -23,14 +24,14 @@ const TaskList = () => {
   return (
     <Stack spacing={2}>
       <Stack>
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} className="h-16">
           <IconButton onClick={() => setIsAdding(!isAdding)}>
             {isAdding ? <RemoveCircleIcon /> : <AddCircleIcon />}
           </IconButton>
-          {isAdding ? <TaskItem edit={true} key={-1} /> : null}
+          {isAdding ? <NewTask parentPath="" /> : null}
         </Stack>
         {unfinished?.map((task: Task) => (
-          <TaskItem task={task} edit={false} key={task.id} />
+          <TaskItem task={task} key={task.id} />
         ))}
       </Stack>
       <Accordion>
@@ -39,7 +40,7 @@ const TaskList = () => {
         </AccordionSummary>
         <AccordionDetails>
           {finished?.map((task: Task) => (
-            <TaskItem task={task} edit={false} key={task.id} />
+            <TaskItem task={task} key={task.id} />
           ))}
         </AccordionDetails>
       </Accordion>

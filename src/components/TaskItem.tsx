@@ -18,8 +18,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import { useLiveQuery } from "dexie-react-hooks";
 
-const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
-  const [isEditingHead, setIsEditingHead] = useState(edit ?? false);
+const TaskItem = ({ task }: { task: Task }) => {
+  const [isEditingHead, setIsEditingHead] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [description, setDescription] = useState(task?.description ?? "");
   const [priority, setPriority] = useState(task?.priority ?? 0);
@@ -30,7 +30,7 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
     ? useLiveQuery(() => api.getSubtasks(task?.parentPath))
     : [];
 
-  const headEditor = (isNew: boolean) => (
+  const headEditor = (
     <>
       <TextField
         label="Description"
@@ -50,25 +50,11 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
       </Select>
       <IconButton
         onClick={() => {
-          if (isNew) {
-            if (!task) {
-              api.addTask(description, priority as Priority, "");
-            } else {
-              api.addTask(
-                description,
-                priority as Priority,
-                task.parentPath ?? ""
-              );
-            }
-            setDescription("");
-            setPriority(0);
-          } else {
-            api.updateTask(task.id, {
-              description,
-              priority: priority as Priority,
-            });
-            setIsEditingHead(false);
-          }
+          api.updateTask(task.id, {
+            description,
+            priority: priority as Priority,
+          });
+          setIsEditingHead(false);
         }}
         className="w-1/8"
       >
@@ -138,7 +124,7 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
           ) : null
         }
       >
-        {isEditingHead ? headEditor(edit) : headDisplay}
+        {isEditingHead ? headEditor : headDisplay}
       </AccordionSummary>
       <AccordionDetails>
         {isEditingBody ? (
