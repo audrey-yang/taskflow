@@ -15,11 +15,12 @@ import Typography from "@mui/material/Typography";
 import { Priority, Status, priority_raw_to_string } from "./../db/types";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Stack from "@mui/material/Stack";
 
 const addTask = async (description: string, pri: Priority) => {
   try {
     if (description) {
-      const id = await tasks_db.tasks.add({
+      await tasks_db.tasks.add({
         description,
         priority: pri,
         status: 0,
@@ -36,6 +37,7 @@ const updateTask = async (
     description?: string;
     priority?: Priority;
     status?: Status;
+    note?: string;
   }
 ) => {
   try {
@@ -50,11 +52,13 @@ const deleteTask = async (id: number) => {
 };
 
 const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
-  const [isEditing, setIsEditing] = useState(edit ?? false);
+  const [isEditingHead, setIsEditingHead] = useState(edit ?? false);
   const [expanded, setExpanded] = useState(false);
   const [description, setDescription] = useState(task?.description ?? "");
   const [priority, setPriority] = useState(task?.priority ?? 0);
   const [status, setStatus] = useState(task?.status ?? 0);
+  const [isEditingBody, setIsEditingBody] = useState(!task?.note);
+  const [note, setNote] = useState(task?.note ?? "");
 
   return (
     <Accordion expanded={expanded} disabled={task === null}>
@@ -65,7 +69,7 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
           ) : null
         }
       >
-        {isEditing ? (
+        {isEditingHead ? (
           <>
             <TextField
               label="Description"
@@ -94,7 +98,7 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
                     description,
                     priority: priority as Priority,
                   });
-                  setIsEditing(false);
+                  setIsEditingHead(false);
                 }
               }}
               className="w-1/8"
@@ -106,7 +110,7 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
                 onClick={() => {
                   setDescription(task?.description);
                   setPriority(task?.priority);
-                  setIsEditing(false);
+                  setIsEditingHead(false);
                 }}
                 className="w-1/8"
               >
@@ -139,7 +143,7 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
             </Select>
             <IconButton
               aria-label="edit"
-              onClick={() => setIsEditing(true)}
+              onClick={() => setIsEditingHead(true)}
               className="w-1/8"
             >
               <EditIcon />
@@ -155,8 +159,41 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
         )}
       </AccordionSummary>
       <AccordionDetails>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-        malesuada lacus ex, sit amet blandit leo lobortis eget.
+        {isEditingBody ? (
+          <Stack direction="row" spacing={2}>
+            <TextField
+              className="w-3/4"
+              label="Add a note"
+              value={note}
+              onChange={(ev) => setNote(ev.target.value)}
+              multiline
+              maxRows={4}
+            />
+            <IconButton
+              onClick={() => {
+                updateTask(task.id, {
+                  note,
+                });
+                setIsEditingBody(false);
+              }}
+              className="w-1/8"
+            >
+              <DoneIcon />
+            </IconButton>
+          </Stack>
+        ) : (
+          <Stack direction="row">
+            <Typography className="w-7/8 italic" sx={{ margin: "auto 0" }}>
+              Note: {note}
+            </Typography>
+            <IconButton
+              onClick={() => setIsEditingBody(true)}
+              className="w-1/8 mx-2"
+            >
+              <EditIcon />
+            </IconButton>
+          </Stack>
+        )}
       </AccordionDetails>
     </Accordion>
   );
