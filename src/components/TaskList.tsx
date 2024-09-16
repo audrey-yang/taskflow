@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import { tasks_db } from "./../db";
+import { tasks_db } from "./../db/db";
+import { Task } from "../db/types";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Task } from "./../object_types";
+import TaskItem from "./TaskItem";
 
 const TaskList = () => {
   const tasks = useLiveQuery(() => tasks_db.tasks.toArray());
 
   return (
-    <ul>
+    <div>
+      <TaskItem edit={true} key={-1} />
       {tasks?.map((task: Task) => (
-        <li key={task.id}>{task.description}</li>
+        <TaskItem task={task} edit={false} key={task.id} />
       ))}
-    </ul>
+    </div>
   );
 };
 

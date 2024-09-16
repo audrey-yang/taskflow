@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from "dexie";
-import { Task } from "./object_types";
+import { Task } from "./types";
 
 const tasks_db = new Dexie("TasksDatabase") as Dexie & {
   tasks: EntityTable<
@@ -10,7 +10,7 @@ const tasks_db = new Dexie("TasksDatabase") as Dexie & {
 
 // Schema declaration:
 tasks_db.version(1).stores({
-  tasks: "++id, description, note, priority, status, subtasks",
+  tasks: "++id, description, note, priority, status",
 });
 
 export { tasks_db };
