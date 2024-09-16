@@ -10,9 +10,9 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DoneIcon from "@mui/icons-material/Done";
+import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import { Priority, Status, priority_raw_to_string } from "./../db/types";
-import Grid from "@mui/material/Grid2";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
@@ -68,11 +68,13 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
             <TextField
               label="Description"
               onChange={(ev) => setDescription(ev.target.value)}
+              className="w-1/2 mx-2"
             />
             <Select
               value={priority}
               label="Priority"
               onChange={(ev) => setPriority(ev.target.value as Priority)}
+              className="w-1/4 mx-2"
             >
               <MenuItem value={0}>Low</MenuItem>
               <MenuItem value={1}>Medium</MenuItem>
@@ -89,15 +91,32 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
                     priority: priority as Priority,
                   });
                 }
+                setIsEditing(false);
               }}
+              className="w-1/8"
             >
               <DoneIcon />
             </IconButton>
+            <IconButton
+              aria-label="add"
+              onClick={() => {
+                setDescription(task?.description);
+                setPriority(task?.priority);
+                setIsEditing(false);
+              }}
+              className="w-1/8"
+            >
+              <CloseIcon />
+            </IconButton>
           </>
         ) : (
-          <Grid container spacing={3}>
-            <Typography>{description}</Typography>
-            <Typography>{priority_raw_to_string(priority)}</Typography>
+          <>
+            <Typography className="w-1/2" sx={{ margin: "auto 0" }}>
+              {description}
+            </Typography>
+            <Typography className="w-1/5" sx={{ margin: "auto 0" }}>
+              {priority_raw_to_string(priority)}
+            </Typography>
             <Select
               value={status}
               label="Status"
@@ -107,18 +126,27 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
                 });
                 setStatus(ev.target.value as Status);
               }}
+              className="w-1/5"
             >
               <MenuItem value={0}>Not started</MenuItem>
               <MenuItem value={1}>Started</MenuItem>
               <MenuItem value={2}>Completed</MenuItem>
             </Select>
-            <IconButton aria-label="edit" onClick={() => setIsEditing(true)}>
+            <IconButton
+              aria-label="edit"
+              onClick={() => setIsEditing(true)}
+              className="w-1/8"
+            >
               <EditIcon />
             </IconButton>
-            <IconButton aria-label="delete" onClick={() => deleteTask(task.id)}>
+            <IconButton
+              aria-label="delete"
+              onClick={() => deleteTask(task.id)}
+              className="w-1/8"
+            >
               <DeleteIcon />
             </IconButton>
-          </Grid>
+          </>
         )}
       </AccordionSummary>
       <AccordionDetails>
