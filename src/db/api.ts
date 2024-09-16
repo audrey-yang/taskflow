@@ -45,13 +45,21 @@ export const getTasks = () => {
 };
 
 export const getSubtasks = (parentPath: string) => {
-  return db.tasks.where("parentPath").equals(parentPath).toArray();
+  return db.tasks.filter((task) => task.parentPath === parentPath).toArray();
 };
 
 export const getIncompleteTasks = () => {
-  return db.tasks.where("status").notEqual(2).toArray();
+  return db.tasks
+    .where("status")
+    .notEqual(2)
+    .filter((task) => task.parentPath === "")
+    .toArray();
 };
 
 export const getCompleteTasks = () => {
-  return db.tasks.where("status").equals(2).toArray();
+  return db.tasks
+    .where("status")
+    .equals(2)
+    .filter((task) => task.parentPath === "")
+    .toArray();
 };

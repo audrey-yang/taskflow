@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Typography } from "@mui/material";
 import { Task } from "../db/types";
 import { useLiveQuery } from "dexie-react-hooks";
 import TaskItem from "./TaskItem";
@@ -28,22 +27,24 @@ const TaskList = () => {
           <IconButton onClick={() => setIsAdding(!isAdding)}>
             {isAdding ? <RemoveCircleIcon /> : <AddCircleIcon />}
           </IconButton>
-          {isAdding ? <NewTask parentPath="" /> : null}
+          {isAdding ? <NewTask /> : null}
         </Stack>
         {unfinished?.map((task: Task) => (
           <TaskItem task={task} key={task.id} />
         ))}
       </Stack>
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Completed</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {finished?.map((task: Task) => (
-            <TaskItem task={task} key={task.id} />
-          ))}
-        </AccordionDetails>
-      </Accordion>
+      <Stack>
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            See more
+          </AccordionSummary>
+          <AccordionDetails>
+            {finished?.map((task: Task) => (
+              <TaskItem task={task} key={task.id} />
+            ))}
+          </AccordionDetails>
+        </Accordion>
+      </Stack>
     </Stack>
   );
 };

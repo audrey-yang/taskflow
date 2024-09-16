@@ -2,18 +2,18 @@ import { useState } from "react";
 import { TextField, Select, IconButton, MenuItem } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import DoneIcon from "@mui/icons-material/Done";
-import { Priority } from "./../db/types";
+import { Priority, Task } from "./../db/types";
 import * as api from "./../db/api";
 
 const NewTask = ({
-  parentPath,
+  parentTask,
   isSubtask,
 }: {
-  parentPath: string;
+  parentTask?: Task;
   isSubtask?: boolean;
 }) => {
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState(0);
+  const [priority, setPriority] = useState(parentTask?.priority ?? 0);
 
   return (
     <Stack direction="row" className="w-full">
@@ -37,7 +37,14 @@ const NewTask = ({
       )}
       <IconButton
         onClick={() => {
-          api.addTask(description, priority as Priority, parentPath);
+          api.addTask(
+            description,
+            priority as Priority,
+            parentTask ? `${parentTask.parentPath}/${parentTask.id}` : ""
+          );
+          console.log(
+            parentTask ? `${parentTask.parentPath}/${parentTask.id}` : ""
+          );
           setDescription("");
           setPriority(0);
         }}
