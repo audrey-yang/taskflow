@@ -14,4 +14,5 @@ export interface Task {
   note?: string;
   priority: Priority;
   status: Status;
+  parentPath?: string;
 }

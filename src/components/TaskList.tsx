@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { tasks_db } from "./../db/db";
+import { Typography } from "@mui/material";
 import { Task } from "../db/types";
 import { useLiveQuery } from "dexie-react-hooks";
 import TaskItem from "./TaskItem";
@@ -13,15 +13,12 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import * as api from "./../db/api";
 
 const TaskList = () => {
   const [isAdding, setIsAdding] = useState(false);
-  const unfinished = useLiveQuery(() =>
-    tasks_db.tasks.where("status").notEqual(2).toArray()
-  );
-  const finished = useLiveQuery(() =>
-    tasks_db.tasks.where("status").equals(2).toArray()
-  );
+  const unfinished = useLiveQuery(() => api.getIncompleteTasks());
+  const finished = useLiveQuery(() => api.getCompleteTasks());
 
   return (
     <Stack spacing={2}>
@@ -38,7 +35,7 @@ const TaskList = () => {
       </Stack>
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          Completed tasks
+          <Typography variant="h6">Completed</Typography>
         </AccordionSummary>
         <AccordionDetails>
           {finished?.map((task: Task) => (

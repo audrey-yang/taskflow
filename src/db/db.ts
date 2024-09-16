@@ -10,7 +10,7 @@ const tasks_db = new Dexie("TasksDatabase") as Dexie & {
 
 // Schema declaration:
 tasks_db.version(1).stores({
-  tasks: "++id, description, note, priority, status",
+  tasks: "++id, description, note, priority, status, parentPath",
 });
 
 export { tasks_db };

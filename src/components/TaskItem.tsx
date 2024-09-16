@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { tasks_db } from "../db/db";
 import { Task } from "../db/types";
+import * as api from "./../db/api";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -16,40 +16,7 @@ import { Priority, Status, priority_raw_to_string } from "./../db/types";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
-
-const addTask = async (description: string, pri: Priority) => {
-  try {
-    if (description) {
-      await tasks_db.tasks.add({
-        description,
-        priority: pri,
-        status: 0,
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const updateTask = async (
-  id: number,
-  update: {
-    description?: string;
-    priority?: Priority;
-    status?: Status;
-    note?: string;
-  }
-) => {
-  try {
-    await tasks_db.tasks.update(id, update);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const deleteTask = async (id: number) => {
-  await tasks_db.tasks.delete(id);
-};
+import { useLiveQuery } from "dexie-react-hooks";
 
 const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
   const [isEditingHead, setIsEditingHead] = useState(edit ?? false);
@@ -59,6 +26,108 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
   const [status, setStatus] = useState(task?.status ?? 0);
   const [isEditingBody, setIsEditingBody] = useState(!task?.note);
   const [note, setNote] = useState(task?.note ?? "");
+  const subtasks = task?.parentPath
+    ? useLiveQuery(() => api.getSubtasks(task?.parentPath))
+    : [];
+
+  const headEditor = (isNew: boolean) => (
+    <>
+      <TextField
+        label="Description"
+        onChange={(ev) => setDescription(ev.target.value)}
+        value={description}
+        className="w-1/2 mx-2"
+      />
+      <Select
+        value={priority}
+        label="Priority"
+        onChange={(ev) => setPriority(ev.target.value as Priority)}
+        className="w-1/4 mx-2"
+      >
+        <MenuItem value={0}>Low</MenuItem>
+        <MenuItem value={1}>Medium</MenuItem>
+        <MenuItem value={2}>High</MenuItem>
+      </Select>
+      <IconButton
+        onClick={() => {
+          if (isNew) {
+            if (!task) {
+              api.addTask(description, priority as Priority, "");
+            } else {
+              api.addTask(
+                description,
+                priority as Priority,
+                task.parentPath ?? ""
+              );
+            }
+            setDescription("");
+            setPriority(0);
+          } else {
+            api.updateTask(task.id, {
+              description,
+              priority: priority as Priority,
+            });
+            setIsEditingHead(false);
+          }
+        }}
+        className="w-1/8"
+      >
+        <DoneIcon />
+      </IconButton>
+      {task ? (
+        <IconButton
+          onClick={() => {
+            setDescription(task?.description);
+            setPriority(task?.priority);
+            setIsEditingHead(false);
+          }}
+          className="w-1/8"
+        >
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </>
+  );
+
+  const headDisplay = (
+    <>
+      <Typography className="w-1/2" sx={{ margin: "auto 0" }}>
+        {description}
+      </Typography>
+      <Typography className="w-1/5" sx={{ margin: "auto 0" }}>
+        {priority_raw_to_string(priority)}
+      </Typography>
+      <Select
+        value={status}
+        label="Status"
+        onChange={(ev) => {
+          api.updateTask(task.id, {
+            status: ev.target.value as Status,
+          });
+          setStatus(ev.target.value as Status);
+        }}
+        className="w-1/5"
+      >
+        <MenuItem value={0}>Not started</MenuItem>
+        <MenuItem value={1}>Started</MenuItem>
+        <MenuItem value={2}>Completed</MenuItem>
+      </Select>
+      <IconButton
+        aria-label="edit"
+        onClick={() => setIsEditingHead(true)}
+        className="w-1/8"
+      >
+        <EditIcon />
+      </IconButton>
+      <IconButton
+        aria-label="delete"
+        onClick={() => api.deleteTask(task.id)}
+        className="w-1/8"
+      >
+        <DeleteIcon />
+      </IconButton>
+    </>
+  );
 
   return (
     <Accordion expanded={expanded} disabled={task === null}>
@@ -69,94 +138,7 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
           ) : null
         }
       >
-        {isEditingHead ? (
-          <>
-            <TextField
-              label="Description"
-              onChange={(ev) => setDescription(ev.target.value)}
-              value={description}
-              className="w-1/2 mx-2"
-            />
-            <Select
-              value={priority}
-              label="Priority"
-              onChange={(ev) => setPriority(ev.target.value as Priority)}
-              className="w-1/4 mx-2"
-            >
-              <MenuItem value={0}>Low</MenuItem>
-              <MenuItem value={1}>Medium</MenuItem>
-              <MenuItem value={2}>High</MenuItem>
-            </Select>
-            <IconButton
-              onClick={() => {
-                if (!task) {
-                  addTask(description, priority as Priority);
-                  setDescription("");
-                  setPriority(0);
-                } else {
-                  updateTask(task.id, {
-                    description,
-                    priority: priority as Priority,
-                  });
-                  setIsEditingHead(false);
-                }
-              }}
-              className="w-1/8"
-            >
-              <DoneIcon />
-            </IconButton>
-            {task ? (
-              <IconButton
-                onClick={() => {
-                  setDescription(task?.description);
-                  setPriority(task?.priority);
-                  setIsEditingHead(false);
-                }}
-                className="w-1/8"
-              >
-                <CloseIcon />
-              </IconButton>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <Typography className="w-1/2" sx={{ margin: "auto 0" }}>
-              {description}
-            </Typography>
-            <Typography className="w-1/5" sx={{ margin: "auto 0" }}>
-              {priority_raw_to_string(priority)}
-            </Typography>
-            <Select
-              value={status}
-              label="Status"
-              onChange={(ev) => {
-                updateTask(task.id, {
-                  status: ev.target.value as Status,
-                });
-                setStatus(ev.target.value as Status);
-              }}
-              className="w-1/5"
-            >
-              <MenuItem value={0}>Not started</MenuItem>
-              <MenuItem value={1}>Started</MenuItem>
-              <MenuItem value={2}>Completed</MenuItem>
-            </Select>
-            <IconButton
-              aria-label="edit"
-              onClick={() => setIsEditingHead(true)}
-              className="w-1/8"
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton
-              aria-label="delete"
-              onClick={() => deleteTask(task.id)}
-              className="w-1/8"
-            >
-              <DeleteIcon />
-            </IconButton>
-          </>
-        )}
+        {isEditingHead ? headEditor(edit) : headDisplay}
       </AccordionSummary>
       <AccordionDetails>
         {isEditingBody ? (
@@ -171,7 +153,7 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
             />
             <IconButton
               onClick={() => {
-                updateTask(task.id, {
+                api.updateTask(task.id, {
                   note,
                 });
                 setIsEditingBody(false);
@@ -183,12 +165,12 @@ const TaskItem = ({ task, edit }: { task?: Task; edit?: boolean }) => {
           </Stack>
         ) : (
           <Stack direction="row">
-            <Typography className="w-7/8 italic" sx={{ margin: "auto 0" }}>
-              Note: {note}
-            </Typography>
+            <Stack className="w-7/8 italic" sx={{ margin: "auto 0" }}>
+              <pre>Note: {note}</pre>
+            </Stack>
             <IconButton
               onClick={() => setIsEditingBody(true)}
-              className="w-1/8 mx-2"
+              className="w-1/8 mx-4"
             >
               <EditIcon />
             </IconButton>

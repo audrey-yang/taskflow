@@ -1,9 +1,10 @@
+import { Typography } from "@mui/material";
 import TaskList from "./components/TaskList";
 
 const App = () => {
   return (
     <div className="App">
-      <h1>My tasks</h1>
+      <Typography variant="h3">Taskflow</Typography>
       <TaskList />
     </div>
   );
