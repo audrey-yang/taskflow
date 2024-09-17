@@ -66,3 +66,23 @@ export const getCompleteTasks = () => {
     .filter((task) => task.parentPath === "")
     .toArray();
 };
+
+export const getNumberOfTasks = (status: Status) => {
+  return db.tasks
+    .where("status")
+    .equals(status)
+    .filter((task) => task.parentPath === "")
+    .count();
+};
+
+export const getNumberOfUnstartedTasks = () => {
+  return getNumberOfTasks(0);
+};
+
+export const getNumberOfStartedTasks = () => {
+  return getNumberOfTasks(1);
+};
+
+export const getNumberOfCompletedTasks = () => {
+  return getNumberOfTasks(2);
+};

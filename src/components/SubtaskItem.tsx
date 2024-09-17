@@ -32,7 +32,7 @@ const SubtaskItem = ({ task }: { task: Task }) => {
         label="Description"
         onChange={(ev) => setDescription(ev.target.value)}
         value={description}
-        className="w-1/2 mx-2"
+        className="w-3/4 mx-2"
       />
       <IconButton
         onClick={() => {
@@ -61,7 +61,7 @@ const SubtaskItem = ({ task }: { task: Task }) => {
 
   const headDisplay = (
     <>
-      <Typography className="w-1/2" sx={{ margin: "auto 0" }}>
+      <Typography className="w-3/4" sx={{ margin: "auto 0" }}>
         {description}
       </Typography>
       <IconButton
