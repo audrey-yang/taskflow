@@ -10,25 +10,17 @@ import {
   IconButton,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import * as api from "./../db/api";
 import NewTask from "./NewTask";
 
 const TaskList = () => {
-  const [isAdding, setIsAdding] = useState(false);
   const unfinished = useLiveQuery(() => api.getIncompleteTasks());
   const finished = useLiveQuery(() => api.getCompleteTasks());
 
   return (
     <Stack spacing={2}>
       <Stack>
-        <Stack direction="row" spacing={1} className="h-16">
-          <IconButton onClick={() => setIsAdding(!isAdding)}>
-            {isAdding ? <RemoveCircleIcon /> : <AddCircleIcon />}
-          </IconButton>
-          {isAdding ? <NewTask /> : null}
-        </Stack>
+        <NewTask />
         {unfinished?.map((task: Task) => (
           <TaskItem task={task} key={task.id} />
         ))}
@@ -36,7 +28,7 @@ const TaskList = () => {
       <Stack>
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            See more
+            See completed
           </AccordionSummary>
           <AccordionDetails>
             {finished?.map((task: Task) => (

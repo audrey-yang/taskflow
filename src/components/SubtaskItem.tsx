@@ -130,7 +130,7 @@ const SubtaskItem = ({ task }: { task: Task }) => {
         )}
         <NewTask parentTask={task} isSubtask={true} />
         {subtasks?.map((subtask) => (
-          <SubtaskItem task={subtask} />
+          <SubtaskItem task={subtask} key={subtask.id} />
         ))}
       </AccordionDetails>
     </Accordion>

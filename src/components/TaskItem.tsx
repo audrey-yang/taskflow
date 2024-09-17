@@ -165,7 +165,6 @@ const TaskItem = ({ task }: { task: Task }) => {
             </IconButton>
           </Stack>
         )}
-        {task.id}
         <NewTask parentTask={task} isSubtask={true} />
         {subtasks.map((subtask) => (
           <SubtaskItem task={subtask} key={subtask.id} />

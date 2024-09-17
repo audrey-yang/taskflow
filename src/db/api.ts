@@ -37,6 +37,9 @@ export const updateTask = async (
 };
 
 export const deleteTask = async (id: number) => {
+  await db.tasks
+    .filter((task) => task.parentPath.includes(id.toString()))
+    .delete();
   await db.tasks.delete(id);
 };
 
