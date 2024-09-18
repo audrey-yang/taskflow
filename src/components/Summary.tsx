@@ -1,4 +1,4 @@
-import * as api from "./../db/api";
+import * as api from "../db/api";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -8,9 +8,9 @@ import PendingIcon from "@mui/icons-material/Pending";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useLiveQuery } from "dexie-react-hooks";
 
-const Status = () => {
+const Summary = () => {
   const unstarted = useLiveQuery(() => api.getNumberOfUnstartedTasks());
-  const started = useLiveQuery(() => api.getNumberOfStartedTasks());
+  const started = useLiveQuery(() => api.getNumberOfInProgressTasks());
   const completed = useLiveQuery(() => api.getNumberOfCompletedTasks());
 
   return (
@@ -37,4 +37,4 @@ const Status = () => {
   );
 };
 
-export default Status;
+export default Summary;

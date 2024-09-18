@@ -1,5 +1,5 @@
 import { tasks_db as db } from "./db";
-import { Priority, Status } from "./types";
+import { Priority, STATUS, Status } from "./types";
 
 export const addTask = async (
   description: string,
@@ -11,7 +11,7 @@ export const addTask = async (
       await db.tasks.add({
         description,
         priority: pri,
-        status: 2,
+        status: STATUS.NOT_STARTED,
         parentPath,
       });
     }
@@ -54,16 +54,16 @@ export const getSubtasks = (parentPath: string) => {
 export const getIncompleteTasks = () => {
   return db.tasks
     .where("status")
-    .notEqual(0)
+    .notEqual(STATUS.COMPLETED)
     .filter((task) => task.parentPath === "")
     .reverse()
-    .sortBy("[priority+status]");
+    .sortBy("priority");
 };
 
 export const getCompleteTasks = () => {
   return db.tasks
     .where("status")
-    .equals(0)
+    .equals(STATUS.COMPLETED)
     .filter((task) => task.parentPath === "")
     .toArray();
 };
@@ -77,13 +77,13 @@ export const getNumberOfTasks = (status: Status) => {
 };
 
 export const getNumberOfUnstartedTasks = () => {
-  return getNumberOfTasks(2);
+  return getNumberOfTasks(STATUS.NOT_STARTED);
 };
 
-export const getNumberOfStartedTasks = () => {
-  return getNumberOfTasks(1);
+export const getNumberOfInProgressTasks = () => {
+  return getNumberOfTasks(STATUS.IN_PROGRESS);
 };
 
 export const getNumberOfCompletedTasks = () => {
-  return getNumberOfTasks(0);
+  return getNumberOfTasks(STATUS.COMPLETED);
 };

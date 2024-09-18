@@ -5,7 +5,7 @@ import {
   Typography,
 } from "@mui/material";
 import TaskList from "./components/TaskList";
-import Status from "./components/Status";
+import Status from "./components/Summary";
 
 const darkTheme = createTheme({
   palette: {

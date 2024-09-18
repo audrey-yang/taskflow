@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { priorityToRaw, statusToString, Task } from "../db/types";
+import {
+  PRIORITY,
+  STATUS,
+  statusToString,
+  Task,
+  Priority,
+  Status,
+  priorityToString,
+} from "../db/types";
 import * as api from "./../db/api";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -12,7 +20,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
-import { Priority, Status, priorityToString } from "./../db/types";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
@@ -24,8 +31,8 @@ const TaskItem = ({ task }: { task: Task }) => {
   const [isEditingHead, setIsEditingHead] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [description, setDescription] = useState(task.description ?? "");
-  const [priority, setPriority] = useState(task.priority ?? 0);
-  const [status, setStatus] = useState(task.status ?? 2);
+  const [priority, setPriority] = useState(task.priority);
+  const [status, setStatus] = useState(task.status);
   const [isEditingBody, setIsEditingBody] = useState(!task.note);
   const [note, setNote] = useState(task?.note ?? "");
   const subtasks =
@@ -47,9 +54,15 @@ const TaskItem = ({ task }: { task: Task }) => {
         onChange={(ev) => setPriority(ev.target.value as Priority)}
         className="w-1/4 mx-2"
       >
-        <MenuItem value={0}>{priorityToString(0)}</MenuItem>
-        <MenuItem value={1}>{priorityToString(1)}</MenuItem>
-        <MenuItem value={2}>{priorityToString(2)}</MenuItem>
+        <MenuItem value={PRIORITY.LOW}>
+          {priorityToString(PRIORITY.LOW)}
+        </MenuItem>
+        <MenuItem value={PRIORITY.MEDIUM}>
+          {priorityToString(PRIORITY.MEDIUM)}
+        </MenuItem>
+        <MenuItem value={PRIORITY.HIGH}>
+          {priorityToString(PRIORITY.HIGH)}
+        </MenuItem>
       </Select>
       <IconButton
         onClick={() => {
@@ -66,8 +79,8 @@ const TaskItem = ({ task }: { task: Task }) => {
       {task ? (
         <IconButton
           onClick={() => {
-            setDescription(task?.description);
-            setPriority(task?.priority);
+            setDescription(task.description);
+            setPriority(task.priority);
             setIsEditingHead(false);
           }}
           className="w-1/8"
@@ -97,9 +110,15 @@ const TaskItem = ({ task }: { task: Task }) => {
         }}
         className="w-1/5"
       >
-        <MenuItem value={2}>{statusToString(2)}</MenuItem>
-        <MenuItem value={1}>{statusToString(1)}</MenuItem>
-        <MenuItem value={0}>{statusToString(0)}</MenuItem>
+        <MenuItem value={STATUS.NOT_STARTED}>
+          {statusToString(STATUS.NOT_STARTED)}
+        </MenuItem>
+        <MenuItem value={STATUS.IN_PROGRESS}>
+          {statusToString(STATUS.IN_PROGRESS)}
+        </MenuItem>
+        <MenuItem value={STATUS.COMPLETED}>
+          {statusToString(STATUS.COMPLETED)}
+        </MenuItem>
       </Select>
       <IconButton
         aria-label="edit"

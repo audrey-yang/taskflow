@@ -10,7 +10,7 @@ import Stack from "@mui/material/Stack";
 import DoneIcon from "@mui/icons-material/Done";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import { Priority, priorityToString, Task } from "./../db/types";
+import { PRIORITY, Priority, priorityToString, Task } from "./../db/types";
 import * as api from "./../db/api";
 
 const NewTask = ({
@@ -22,7 +22,9 @@ const NewTask = ({
 }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState(parentTask?.priority ?? 0);
+  const [priority, setPriority] = useState(
+    parentTask?.priority ?? PRIORITY.LOW
+  );
 
   return (
     <Stack direction="row" spacing={1} className="p-2">
@@ -50,9 +52,15 @@ const NewTask = ({
               onChange={(ev) => setPriority(ev.target.value as Priority)}
               className="w-1/4 mx-2"
             >
-              <MenuItem value={0}>{priorityToString(0)}</MenuItem>
-              <MenuItem value={1}>{priorityToString(1)}</MenuItem>
-              <MenuItem value={2}>{priorityToString(2)}</MenuItem>
+              <MenuItem value={PRIORITY.LOW}>
+                {priorityToString(PRIORITY.LOW)}
+              </MenuItem>
+              <MenuItem value={PRIORITY.MEDIUM}>
+                {priorityToString(PRIORITY.MEDIUM)}
+              </MenuItem>
+              <MenuItem value={PRIORITY.HIGH}>
+                {priorityToString(PRIORITY.HIGH)}
+              </MenuItem>
             </Select>
           )}
           <IconButton
@@ -63,7 +71,7 @@ const NewTask = ({
                 parentTask ? `${parentTask.parentPath}/${parentTask.id}` : ""
               );
               setDescription("");
-              setPriority(parentTask?.priority ?? 0);
+              setPriority(parentTask?.priority ?? PRIORITY.LOW);
             }}
             className="w-1/8"
           >
