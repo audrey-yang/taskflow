@@ -10,7 +10,7 @@ import Stack from "@mui/material/Stack";
 import DoneIcon from "@mui/icons-material/Done";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import { Priority, Task } from "./../db/types";
+import { Priority, priorityToString, Task } from "./../db/types";
 import * as api from "./../db/api";
 
 const NewTask = ({
@@ -38,7 +38,7 @@ const NewTask = ({
       {isAdding ? (
         <Stack direction="row" className="w-full">
           <TextField
-            label="Description"
+            label="Task"
             onChange={(ev) => setDescription(ev.target.value)}
             value={description}
             className="w-1/2 mx-2"
@@ -50,9 +50,9 @@ const NewTask = ({
               onChange={(ev) => setPriority(ev.target.value as Priority)}
               className="w-1/4 mx-2"
             >
-              <MenuItem value={0}>Low</MenuItem>
-              <MenuItem value={1}>Medium</MenuItem>
-              <MenuItem value={2}>High</MenuItem>
+              <MenuItem value={0}>{priorityToString(0)}</MenuItem>
+              <MenuItem value={1}>{priorityToString(1)}</MenuItem>
+              <MenuItem value={2}>{priorityToString(2)}</MenuItem>
             </Select>
           )}
           <IconButton

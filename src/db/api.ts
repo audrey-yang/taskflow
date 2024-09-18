@@ -11,7 +11,7 @@ export const addTask = async (
       await db.tasks.add({
         description,
         priority: pri,
-        status: 0,
+        status: 2,
         parentPath,
       });
     }
@@ -54,15 +54,16 @@ export const getSubtasks = (parentPath: string) => {
 export const getIncompleteTasks = () => {
   return db.tasks
     .where("status")
-    .notEqual(2)
+    .notEqual(0)
     .filter((task) => task.parentPath === "")
-    .toArray();
+    .reverse()
+    .sortBy("[priority+status]");
 };
 
 export const getCompleteTasks = () => {
   return db.tasks
     .where("status")
-    .equals(2)
+    .equals(0)
     .filter((task) => task.parentPath === "")
     .toArray();
 };
@@ -76,7 +77,7 @@ export const getNumberOfTasks = (status: Status) => {
 };
 
 export const getNumberOfUnstartedTasks = () => {
-  return getNumberOfTasks(0);
+  return getNumberOfTasks(2);
 };
 
 export const getNumberOfStartedTasks = () => {
@@ -84,5 +85,5 @@ export const getNumberOfStartedTasks = () => {
 };
 
 export const getNumberOfCompletedTasks = () => {
-  return getNumberOfTasks(2);
+  return getNumberOfTasks(0);
 };

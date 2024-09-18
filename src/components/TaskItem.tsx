@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Task } from "../db/types";
+import { priorityToRaw, statusToString, Task } from "../db/types";
 import * as api from "./../db/api";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -12,7 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
-import { Priority, Status, priority_raw_to_string } from "./../db/types";
+import { Priority, Status, priorityToString } from "./../db/types";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
@@ -25,7 +25,7 @@ const TaskItem = ({ task }: { task: Task }) => {
   const [expanded, setExpanded] = useState(false);
   const [description, setDescription] = useState(task.description ?? "");
   const [priority, setPriority] = useState(task.priority ?? 0);
-  const [status, setStatus] = useState(task.status ?? 0);
+  const [status, setStatus] = useState(task.status ?? 2);
   const [isEditingBody, setIsEditingBody] = useState(!task.note);
   const [note, setNote] = useState(task?.note ?? "");
   const subtasks =
@@ -36,7 +36,7 @@ const TaskItem = ({ task }: { task: Task }) => {
   const headEditor = (
     <>
       <TextField
-        label="Description"
+        label="Task"
         onChange={(ev) => setDescription(ev.target.value)}
         value={description}
         className="w-1/2 mx-2"
@@ -47,9 +47,9 @@ const TaskItem = ({ task }: { task: Task }) => {
         onChange={(ev) => setPriority(ev.target.value as Priority)}
         className="w-1/4 mx-2"
       >
-        <MenuItem value={0}>Low</MenuItem>
-        <MenuItem value={1}>Medium</MenuItem>
-        <MenuItem value={2}>High</MenuItem>
+        <MenuItem value={0}>{priorityToString(0)}</MenuItem>
+        <MenuItem value={1}>{priorityToString(1)}</MenuItem>
+        <MenuItem value={2}>{priorityToString(2)}</MenuItem>
       </Select>
       <IconButton
         onClick={() => {
@@ -84,7 +84,7 @@ const TaskItem = ({ task }: { task: Task }) => {
         {description}
       </Typography>
       <Typography className="w-1/5" sx={{ margin: "auto 0" }}>
-        {priority_raw_to_string(priority)}
+        {priorityToString(priority)}
       </Typography>
       <Select
         value={status}
@@ -97,9 +97,9 @@ const TaskItem = ({ task }: { task: Task }) => {
         }}
         className="w-1/5"
       >
-        <MenuItem value={0}>Not started</MenuItem>
-        <MenuItem value={1}>Started</MenuItem>
-        <MenuItem value={2}>Completed</MenuItem>
+        <MenuItem value={2}>{statusToString(2)}</MenuItem>
+        <MenuItem value={1}>{statusToString(1)}</MenuItem>
+        <MenuItem value={0}>{statusToString(0)}</MenuItem>
       </Select>
       <IconButton
         aria-label="edit"
