@@ -6,6 +6,9 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
+const { updateElectronApp } = require("update-electron-app");
+updateElectronApp(); // additional configuration options available
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -26,7 +29,7 @@ const createWindow = () => {
   }
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
