@@ -1,0 +1,30 @@
+name: Release app
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          [
+            { name: 'linux', image: 'ubuntu-latest' },
+            { name: 'windows', image: 'windows-latest' },
+            { name: 'macos', image: 'macos-latest' },
+          ]
+    runs-on: ${{ matrix.os.image }}
+    steps:
+      - name: Github checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        env:
+            MONGODB_USER_PW: ${{ secrets.MONGODB_USER_PW }}
+      - name: Publish app
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          MONGODB_USER_PW: ${{ secrets.MONGODB_USER_PW }}
+        run: npm run publish
