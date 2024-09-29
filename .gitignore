@@ -3,3 +3,4 @@ node_modules
 .vite
 out
 .DS_Store
+.env

@@ -36,8 +36,10 @@ const createWindow = () => {
 };
 
 export const setIPCMainHandlers = () => {
+  require("dotenv").config();
+
   mongoose.connect(
-    "mongodb+srv://rw1:CefEEiZDlXW59EJ9@cluster0.pzgdj.mongodb.net/taskflow?retryWrites=true&w=majority&appName=cluster0"
+    `mongodb+srv://${process.env.MONGDB_USER_PW}@cluster0.pzgdj.mongodb.net/taskflow?retryWrites=true&w=majority&appName=cluster0`
   );
 
   ipcMain.handle("db:addTask", async (_, description, priority, parentTask) => {
