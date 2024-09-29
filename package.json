@@ -1,7 +1,7 @@
 {
   "name": "taskflow",
   "productName": "taskflow",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "taskflow",
   "author": "audrey-yang",
   "main": ".vite/build/main.js",
