@@ -1,12 +1,15 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
+import * as db from "./db/mongo/api";
+import mongoose from "mongoose";
+import { Priority, Status } from "./db/types";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-const { updateElectronApp } = require("update-electron-app");
+import { updateElectronApp } from "update-electron-app";
 updateElectronApp(); // additional configuration options available
 
 const createWindow = () => {
@@ -32,10 +35,71 @@ const createWindow = () => {
   // mainWindow.webContents.openDevTools();
 };
 
+export const setIPCMainHandlers = () => {
+  mongoose.connect(
+    "mongodb+srv://rw1:CefEEiZDlXW59EJ9@cluster0.pzgdj.mongodb.net/taskflow?retryWrites=true&w=majority&appName=cluster0"
+  );
+
+  ipcMain.handle("db:addTask", async (_, description, priority, parentTask) => {
+    return await db.addTask(description, priority, parentTask);
+  });
+
+  ipcMain.handle(
+    "db:updateTask",
+    async (
+      _,
+      id,
+      update: {
+        description?: string;
+        priority?: Priority;
+        status?: Status;
+        note?: string;
+      }
+    ) => {
+      return await db.updateTask(id, update);
+    }
+  );
+
+  ipcMain.handle("db:deleteTask", async (_, id) => {
+    return await db.deleteTask(id);
+  });
+
+  ipcMain.handle("db:getTasks", async (_) => {
+    return await db.getTasks();
+  });
+
+  ipcMain.handle("db:getSubtasks", async (_, parentPath) => {
+    return await db.getSubtasks(parentPath);
+  });
+
+  ipcMain.handle("db:getIncompleteTasks", async (_) => {
+    return await db.getIncompleteTasks();
+  });
+
+  ipcMain.handle("db:getCompleteTasks", async (_) => {
+    return await db.getCompleteTasks();
+  });
+
+  ipcMain.handle("db:getNumberOfUnstartedTasks", async (_) => {
+    return await db.getNumberOfUnstartedTasks();
+  });
+
+  ipcMain.handle("db:getNumberOfInProgressTasks", async (_) => {
+    return await db.getNumberOfInProgressTasks();
+  });
+
+  ipcMain.handle("db:getNumberOfCompletedTasks", async (_) => {
+    return await db.getNumberOfCompletedTasks();
+  });
+};
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", createWindow);
+app.on("ready", () => {
+  createWindow();
+  setIPCMainHandlers();
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

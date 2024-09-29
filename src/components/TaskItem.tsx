@@ -1,14 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   PRIORITY,
   STATUS,
   statusToString,
-  Task,
   Priority,
   Status,
   priorityToString,
 } from "../db/types";
-import * as api from "./../db/api";
+import { Task } from "src/db/mongo/db";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -23,7 +22,6 @@ import Typography from "@mui/material/Typography";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
-import { useLiveQuery } from "dexie-react-hooks";
 import NewTask from "./NewTask";
 import SubtaskItem from "./SubtaskItem";
 
@@ -35,10 +33,16 @@ const TaskItem = ({ task }: { task: Task }) => {
   const [status, setStatus] = useState(task.status);
   const [isEditingBody, setIsEditingBody] = useState(!task.note);
   const [note, setNote] = useState(task?.note ?? "");
-  const subtasks =
-    useLiveQuery(() =>
-      api.getSubtasks(`${task.parentPath ?? ""}/${task.id}`)
-    ) ?? [];
+  const [subtasks, setSubtasks] = useState([]);
+
+  useEffect(() => {
+    const getSubtasks = async () => {
+      setSubtasks(
+        await window.electron.getSubtasks(`${task.parentPath ?? ""}/${task.id}`)
+      );
+    };
+    getSubtasks();
+  }, [subtasks]);
 
   const headEditor = (
     <>
@@ -65,8 +69,8 @@ const TaskItem = ({ task }: { task: Task }) => {
         </MenuItem>
       </Select>
       <IconButton
-        onClick={() => {
-          api.updateTask(task.id, {
+        onClick={async () => {
+          await window.electron.updateTask(task.id, {
             description,
             priority: priority as Priority,
           });
@@ -102,8 +106,8 @@ const TaskItem = ({ task }: { task: Task }) => {
       <Select
         value={status}
         label="Status"
-        onChange={(ev) => {
-          api.updateTask(task.id, {
+        onChange={async (ev) => {
+          await window.electron.updateTask(task.id, {
             status: ev.target.value as Status,
           });
           setStatus(ev.target.value as Status);
@@ -129,7 +133,9 @@ const TaskItem = ({ task }: { task: Task }) => {
       </IconButton>
       <IconButton
         aria-label="delete"
-        onClick={() => api.deleteTask(task.id)}
+        onClick={async () => {
+          await window.electron.deleteTask(task.id);
+        }}
         className="w-1/8"
       >
         <DeleteIcon />
@@ -160,8 +166,8 @@ const TaskItem = ({ task }: { task: Task }) => {
               maxRows={4}
             />
             <IconButton
-              onClick={() => {
-                api.updateTask(task.id, {
+              onClick={async () => {
+                await window.electron.updateTask(task.id, {
                   note,
                 });
                 setIsEditingBody(false);

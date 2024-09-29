@@ -10,8 +10,8 @@ import Stack from "@mui/material/Stack";
 import DoneIcon from "@mui/icons-material/Done";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import { PRIORITY, Priority, priorityToString, Task } from "./../db/types";
-import * as api from "./../db/api";
+import { PRIORITY, Priority, priorityToString } from "./../db/types";
+import { Task } from "src/db/mongo/db";
 
 const NewTask = ({
   parentTask,
@@ -64,8 +64,8 @@ const NewTask = ({
             </Select>
           )}
           <IconButton
-            onClick={() => {
-              api.addTask(
+            onClick={async () => {
+              await window.electron.addTask(
                 description,
                 priority as Priority,
                 parentTask ? `${parentTask.parentPath}/${parentTask.id}` : ""

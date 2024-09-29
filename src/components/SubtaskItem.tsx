@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { Task } from "../db/types";
-import * as api from "./../db/api";
+import { useEffect, useState } from "react";
+import { Task } from "src/db/mongo/db";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -13,7 +12,6 @@ import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
-import { useLiveQuery } from "dexie-react-hooks";
 import NewTask from "./NewTask";
 
 const SubtaskItem = ({ task }: { task: Task }) => {
@@ -22,9 +20,17 @@ const SubtaskItem = ({ task }: { task: Task }) => {
   const [description, setDescription] = useState(task?.description ?? "");
   const [isEditingBody, setIsEditingBody] = useState(!task?.note);
   const [note, setNote] = useState(task?.note ?? "");
-  const subtasks = useLiveQuery(() =>
-    api.getSubtasks(`${task.parentPath ?? ""}/${task.id}`)
-  );
+  const [subtasks, setSubtasks] = useState([]);
+
+  useEffect(() => {
+    const getSubtasks = async () => {
+      const tasks = await window.electron.getSubtasks(
+        `${task.parentPath ?? ""}/${task.id}`
+      );
+      setSubtasks(tasks);
+    };
+    getSubtasks();
+  }, []);
 
   const headEditor = (
     <>
@@ -35,8 +41,8 @@ const SubtaskItem = ({ task }: { task: Task }) => {
         className="w-3/4 mx-2"
       />
       <IconButton
-        onClick={() => {
-          api.updateTask(task.id, {
+        onClick={async () => {
+          await window.electron.updateTask(task.id, {
             description,
           });
           setIsEditingHead(false);
@@ -73,7 +79,7 @@ const SubtaskItem = ({ task }: { task: Task }) => {
       </IconButton>
       <IconButton
         aria-label="delete"
-        onClick={() => api.deleteTask(task.id)}
+        onClick={async () => await window.electron.deleteTask(task.id)}
         className="w-1/8"
       >
         <DeleteIcon />
@@ -104,8 +110,8 @@ const SubtaskItem = ({ task }: { task: Task }) => {
               maxRows={4}
             />
             <IconButton
-              onClick={() => {
-                api.updateTask(task.id, {
+              onClick={async () => {
+                await window.electron.updateTask(task.id, {
                   note,
                 });
                 setIsEditingBody(false);
