@@ -28,3 +28,10 @@
 
 import "./index.css";
 import "./index";
+
+window.addEventListener("online", () => {
+  console.log("online");
+});
+window.addEventListener("offline", () => {
+  console.log("offline");
+});

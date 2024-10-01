@@ -5,6 +5,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import { Priority, Status } from "./db/types";
 
 contextBridge.exposeInMainWorld("electron", {
+  connect: () => ipcRenderer.invoke("connect"),
   addTask: (description: string, priority: Priority, parentTask: string) =>
     ipcRenderer.invoke("db:addTask", description, priority, parentTask),
   updateTask: (

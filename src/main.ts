@@ -9,8 +9,8 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-import { updateElectronApp } from "update-electron-app";
-updateElectronApp(); // additional configuration options available
+// import { updateElectronApp } from "update-electron-app";
+// updateElectronApp(); // additional configuration options available
 
 const createWindow = () => {
   // Create the browser window.
@@ -20,6 +20,7 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
+    icon: path.join(__dirname, "icon"),
   });
 
   // and load the index.html of the app.
@@ -31,17 +32,10 @@ const createWindow = () => {
     );
   }
 
-  // Open the DevTools.
   // mainWindow.webContents.openDevTools();
 };
 
-export const setIPCMainHandlers = () => {
-  require("dotenv").config();
-
-  mongoose.connect(
-    `mongodb+srv://${process.env.MONGDB_USER_PW}@cluster0.pzgdj.mongodb.net/taskflow?retryWrites=true&w=majority&appName=cluster0`
-  );
-
+const setIPCMainHandlers = () => {
   ipcMain.handle("db:addTask", async (_, description, priority, parentTask) => {
     return await db.addTask(description, priority, parentTask);
   });
@@ -98,9 +92,17 @@ export const setIPCMainHandlers = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", () => {
-  createWindow();
+app.on("ready", async () => {
   setIPCMainHandlers();
+  await mongoose
+    .connect(
+      `mongodb+srv://${
+        import.meta.env.VITE_MONGDB_USER_PW
+      }@cluster0.pzgdj.mongodb.net/taskflow?retryWrites=true&w=majority&appName=cluster0`
+    )
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((err) => console.log(err));
+  createWindow();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

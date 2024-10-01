@@ -21,7 +21,7 @@ const Summary = () => {
       setCompleted(await window.electron.getNumberOfCompletedTasks());
     };
     getNumberOfTasks();
-  }, []);
+  }, [unstarted, inProgress, completed]);
 
   return (
     <List dense={true}>
