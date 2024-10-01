@@ -22,17 +22,17 @@ jobs:
           node-version: 22
       - run: npm ci
         env:
-            MONGODB_USER_PW: ${{ secrets.MONGODB_USER_PW }}
+            MONGODB_USER_PW: ${{ secrets.VITE_MONGODB_USER_PW }}
       - name: Package app
         env:
-          MONGODB_USER_PW: ${{ secrets.MONGODB_USER_PW }}
+          MONGODB_USER_PW: ${{ secrets.VITE_MONGODB_USER_PW }}
         run: npm run package
       - name: Make app
         env:
-          MONGODB_USER_PW: ${{ secrets.MONGODB_USER_PW }}
+          MONGODB_USER_PW: ${{ secrets.VITE_MONGODB_USER_PW }}
         run: npm run make
       - name: Publish app
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          MONGODB_USER_PW: ${{ secrets.MONGODB_USER_PW }}
+          MONGODB_USER_PW: ${{ secrets.VITE_MONGODB_USER_PW }}
         run: npm run publish
