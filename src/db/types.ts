@@ -6,6 +6,8 @@ export const PRIORITY = {
   HIGH: 2 as Priority,
 } as const;
 export const priorityToString = (raw: Priority) => priorities[raw];
+const priorityColors = ["green", "yellow", "red"];
+export const priorityToColor = (raw: Priority) => priorityColors[raw];
 
 export type Status = 0 | 1 | 2;
 const statuses = ["Completed", "In progress", "Not started"];

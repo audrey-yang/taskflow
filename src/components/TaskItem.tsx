@@ -6,6 +6,7 @@ import {
   Priority,
   Status,
   priorityToString,
+  priorityToColor,
 } from "../db/types";
 import { Task } from "src/db/mongo/db";
 import Accordion from "@mui/material/Accordion";
@@ -24,6 +25,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import NewTask from "./NewTask";
 import SubtaskItem from "./SubtaskItem";
+import CircleIcon from "@mui/icons-material/Circle";
 
 const TaskItem = ({ task }: { task: Task }) => {
   const [isEditingHead, setIsEditingHead] = useState(false);
@@ -101,6 +103,9 @@ const TaskItem = ({ task }: { task: Task }) => {
         {description}
       </Typography>
       <Typography className="w-1/5" sx={{ margin: "auto 0" }}>
+        <CircleIcon
+          sx={{ color: priorityToColor(priority), margin: "auto 0.25rem" }}
+        />
         {priorityToString(priority)}
       </Typography>
       <Select
